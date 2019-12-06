@@ -1,21 +1,13 @@
 #!/bin/bash 
 
-# Author: d3fiant
-# Purpose: Intended to setup an environment for security work. 
-# Scope: Ubuntu 18.04
-
-
-################## Initiation
-userName=d3fiant
-echo "Running Commands as " + $userName
 
 ################## Dir Setup
 echo "Setting Up Directories"
-rm -rf /home/$userName/Music
-rm -rf /home/$userName/Videos
-rm -rf /home/$userName/Templates
-mkdir /home/$userName/working
-
+rm -rf /root/Music
+rm -rf /root/Videos
+rm -rf /root/Templates
+mkdir /root/working
+mkdir /repos
 
 ################## Utilities
 #apt install 
@@ -24,11 +16,13 @@ apt install git
 apt install mlocate 
 apt install vim
 apt install vsftpd
+apt install powershell
+apt install gdb
+apt install wordlists
 
 
 ################## Python
 echo "Setting Up Python Environment"
-virtualenv -p python3 /tmp/MyEnv
 apt install python3-pip
 pip3 install pwntools
 pip3 install impacket
@@ -37,23 +31,19 @@ pip3 install beautifulsoup4
 
 
 ################## Web
-# Burpsuite
-echo "Installing Burpsuite"
-cd /tmp
-wget "https://portswigger.net/burp/releases/download?product=community&version=2.1.04&type=linux&componentid=100" -O burp_install.sh
-chmod +x burp_install.sh
-./burp_install.sh
+echo "Installing Web Tools"
+apt install burpsuite
+apt install nikto
 
 ################## Network
-
-# nmap
-echo "Installing nmap"
+echo "Installing Network Tools"
 apt install nmap
+apt install wireshark
 
 # Zeek
 cd /tmp
-echo 'deb http://download.opensuse.org/repositories/security:/zeek/xUbuntu_18.04/ /' > /etc/apt/sources.list.d/security:zeek.list
-wget -nv https://download.opensuse.org/repositories/security:zeek/xUbuntu_18.04/Release.key -O Release.key
+echo 'deb http://download.opensuse.org/repositories/security:/zeek/Debian_10/ /' > /etc/apt/sources.list.d/security:zeek.list
+wget -nv https://download.opensuse.org/repositories/security:zeek/Debian_10/Release.key -O Release.key
 apt-key add - < Release.key
 apt-get update
 apt-get install zeek
@@ -73,10 +63,10 @@ sudo ln -s /opt/ghidra_9.1-BETA_DEV/ghidraRun ghidra
 
 # Peda
 echo "Setting Up Peda"
-cd /home/$userName
+cd /home/repos
 git clone https://github.com/longld/peda.git
-echo "source /peda/peda.py" >> /home/$userName/.gdbinit
-chown $userName:$userName /home/$userName/.gdbinit
+echo "source /root/repos/peda/peda.py" >> /root/.gdbinit
+
 
 
 ################## Memory
@@ -90,9 +80,7 @@ apt install sleuthkit
 
 
 ################## Path Setup
-echo "export PATH=/home/d3fiant/.local/bin:/opt/ghidra_9.1-BETA_DEV:/opt/zeek/bin:$PATH" >> /home/$userName/.profile
-cd /usr/bin
-ln -s /opt/BurpSuiteCommunity/BurpSuiteCommunity burp
+echo "export PATH=/repos/ghidra9:$PATH" >> /root/.profile
 
 
 ################## Misc
@@ -102,7 +90,7 @@ echo "Finishing Up"
 source /etc/environment
 
 # Make sure shared drive is working
-sudo vmhgfs-fuse .host:/ /mnt/ -o allow_other -o uid=1000
+vmhgfs-fuse .host:/ /mnt/ -o allow_other -o uid=1000
 
 echo "Complete. Check For erros"
 
